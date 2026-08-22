@@ -104,7 +104,7 @@ function PropertiesPage() {
       <div
         ref={chromeRef}
         style={{ top: headerOffset }}
-        className="fixed inset-x-0 z-30 mx-auto w-full max-w-[480px] bg-[#0B0E11]"
+        className="fixed inset-x-0 z-30 mx-auto w-full max-w-[480px] border-b border-white/10 bg-[#0B0E11]/72 shadow-[0_10px_40px_rgba(0,0,0,0.28)] backdrop-blur-2xl backdrop-saturate-150"
       >
         <div
           ref={filtersShellRef}
@@ -117,8 +117,8 @@ function PropertiesPage() {
           )}
         >
           <div className="min-h-0 overflow-hidden">
-            <div className="hide-on-scroll-inner bg-[#0B0E11] pt-3 pb-3 group-data-[visible=false]:-translate-y-2 group-data-[visible=false]:opacity-0">
-              <div className="no-scrollbar flex gap-2 overflow-x-auto px-4 pb-0.5">
+            <div className="hide-on-scroll-inner px-4 pt-2 pb-2 group-data-[visible=false]:-translate-y-2 group-data-[visible=false]:opacity-0">
+              <div className="no-scrollbar flex gap-1.5 overflow-x-auto pb-0.5">
                 {categories.map(({ id, label, Icon }) => {
                   const active = category === id;
                   return (
@@ -127,71 +127,59 @@ function PropertiesPage() {
                       type="button"
                       onClick={() => setCategory(id)}
                       className={cn(
-                        "press flex shrink-0 flex-col items-center justify-center gap-1 rounded-[12px] border px-3.5 py-2.5",
+                        "press flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 backdrop-blur-md",
                         active
-                          ? "border-[#E0B84A] bg-[#E0B84A]/[0.06] text-white"
-                          : "border-white/12 bg-transparent text-[#9AA1AB]",
+                          ? "border-[#E0B84A]/70 bg-[#E0B84A]/12 text-white shadow-[0_0_0_1px_rgba(224,184,74,0.15)]"
+                          : "border-white/15 bg-white/[0.06] text-[#B0B6BF]",
                       )}
                     >
                       <Icon
-                        className={cn(
-                          "h-[18px] w-[18px]",
-                          active ? "text-[#E0B84A]" : "text-[#C9CDD4]",
-                        )}
+                        className={cn("h-3.5 w-3.5", active ? "text-[#E0B84A]" : "text-[#C9CDD4]")}
                         strokeWidth={1.6}
                       />
-                      <span
-                        className={cn(
-                          "whitespace-nowrap text-[10.5px] font-medium leading-none",
-                          active ? "text-white" : "text-[#9AA1AB]",
-                        )}
-                      >
-                        {label}
-                      </span>
+                      <span className="whitespace-nowrap text-[11px] font-medium leading-none">{label}</span>
                     </button>
                   );
                 })}
               </div>
 
-              <div className="mt-3 px-4">
-                <div className="grid grid-cols-3 gap-2">
-                  {tiers.map(({ id, label }) => {
-                    const active = tier === id;
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => setTier(active ? null : id)}
-                        className={cn(
-                          "press flex items-center justify-center gap-1.5 rounded-full border py-[8px] text-[11.5px] font-medium",
-                          active
-                            ? "border-[#E0B84A] bg-[#E0B84A]/[0.06] text-[#E0B84A]"
-                            : "border-white/14 bg-transparent text-[#B0B6BF]",
-                        )}
-                      >
-                        <Gem className="h-[12px] w-[12px]" strokeWidth={1.8} />
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
+              <div className="mt-2 grid grid-cols-3 gap-1.5">
+                {tiers.map(({ id, label }) => {
+                  const active = tier === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setTier(active ? null : id)}
+                      className={cn(
+                        "press flex items-center justify-center gap-1 rounded-full border py-1.5 text-[10.5px] font-medium backdrop-blur-md",
+                        active
+                          ? "border-[#E0B84A]/70 bg-[#E0B84A]/12 text-[#E0B84A]"
+                          : "border-white/15 bg-white/[0.06] text-[#B0B6BF]",
+                      )}
+                    >
+                      <Gem className="h-3 w-3" strokeWidth={1.8} />
+                      {label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-b border-white/[0.04] bg-[#0B0E11] px-4 py-2.5">
-          <p className="flex items-center gap-1.5 text-[11.5px] text-[#8B93A0]">
-            <Settings2 className="h-[13px] w-[13px]" strokeWidth={1.7} />
-            <span>138 Properties Found</span>
+        <div className="flex items-center justify-between gap-3 border-t border-white/[0.08] px-4 py-2">
+          <p className="flex items-center gap-1.5 text-[11px] text-[#9AA1AB]">
+            <Settings2 className="h-3 w-3" strokeWidth={1.7} />
+            <span>{list.length} Properties Found</span>
           </p>
           <button
             type="button"
-            className="press inline-flex items-center gap-1.5 rounded-full border border-white/14 px-2.5 py-[5px] text-[11px] font-medium text-[#C9CDD4]"
+            className="press inline-flex items-center gap-1 rounded-full border border-white/15 bg-white/[0.06] px-2.5 py-1 text-[10.5px] font-medium text-[#C9CDD4] backdrop-blur-md"
           >
-            <ArrowUpDown className="h-[12px] w-[12px]" strokeWidth={1.8} />
+            <ArrowUpDown className="h-3 w-3" strokeWidth={1.8} />
             Recommended
-            <ChevronDown className="h-[12px] w-[12px] text-[#9AA1AB]" strokeWidth={2} />
+            <ChevronDown className="h-3 w-3 text-[#9AA1AB]" strokeWidth={2} />
           </button>
         </div>
       </div>
