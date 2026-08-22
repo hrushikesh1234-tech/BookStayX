@@ -1,11 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useState } from "react";
 import {
-  ArrowRight,
   Download,
   Heart,
   Home as HomeIcon,
   Leaf,
+  RefreshCw,
   Star,
 } from "lucide-react";
 import { AppTopNav } from "@/components/AppTopNav";
@@ -15,7 +15,6 @@ import { SectionLabel, SerifTitle } from "@/components/brand";
 import { LocationCard } from "@/components/LocationCard";
 import { PropertyCard } from "@/components/PropertyCard";
 import { popularLocations, properties } from "@/data/locations";
-import { IMG } from "@/lib/images";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -49,11 +48,20 @@ const tabs = [
   { id: "recommended", label: "Recommended" },
 ] as const;
 
+const heroImages = [
+  { src: "/heroes/hero-1.jpg", alt: "Luxury glamping terrace at golden sunset" },
+  { src: "/heroes/hero-2.jpg", alt: "Lakeside balcony at sunrise with mountain views" },
+  { src: "/heroes/hero-3.jpg", alt: "Private pool villa under moonlit skies" },
+  { src: "/heroes/hero-4.jpg", alt: "Coastal lighthouse view from a cliffside deck" },
+] as const;
+
 function HomePage() {
   const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("top");
+  const [heroIndex, setHeroIndex] = useState(0);
   const [installOpen, setInstallOpen] = useState(false);
   const { isInstalled, isIos, canNativeInstall, promptNativeInstall, showInstallOption } = usePwaInstall();
   const shown = properties.filter((p) => p.tab === tab);
+  const activeHero = heroImages[heroIndex];
 
   const handleInstall = useCallback(async () => {
     if (isIos) {
@@ -75,62 +83,79 @@ function HomePage() {
       <AppTopNav scrollAware overlay />
 
       {/* HERO */}
-      <section className="relative min-h-[560px] overflow-hidden">
+      <section className="relative flex min-h-[620px] flex-col justify-end overflow-hidden">
         <img
-          src={IMG.hero}
-          alt="Sunset over Pawna Lake with a luxury glamping deck"
+          key={activeHero.src}
+          src={activeHero.src}
+          alt={activeHero.alt}
           width={1280}
           height={1280}
           fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500"
         />
-        <div className="hero-shade absolute inset-0" />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 0%, transparent 30%, rgba(5, 7, 9, 0.38) 58%, rgba(5, 7, 9, 0.88) 82%, rgba(5, 7, 9, 0.98) 100%)",
+          }}
+        />
 
-        <div className="relative px-5 pt-[calc(max(10px,env(safe-area-inset-top))+58px)]">
-          {showInstallOption ? (
-            <div className="mt-1">
+        <div className="absolute inset-x-0 top-[calc(max(10px,env(safe-area-inset-top))+64px)] flex justify-center gap-1.5 px-5">
+          {heroImages.map((hero, index) => (
+            <span
+              key={hero.src}
+              className={cn(
+                "h-1 rounded-full transition-all duration-300",
+                index === heroIndex ? "w-6 bg-gold shadow-[0_0_10px_rgba(217,165,42,0.65)]" : "w-1.5 bg-white/35",
+              )}
+            />
+          ))}
+        </div>
+
+        <div className="relative px-5 pb-10 pt-28">
+          <div className="-translate-y-[10%]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-black/35 px-3 py-1.5 backdrop-blur-md">
+              <Star className="h-3.5 w-3.5 fill-gold text-gold" strokeWidth={1.4} />
+              <span className="text-[11.5px] font-medium tracking-wide text-gold-pale">Premium Luxury Stays</span>
+            </div>
+
+            <h1 className="mt-4 max-w-[18rem] font-display text-[32px] font-semibold leading-[1.12] text-ink">
+              Experience Extraordinary Escapes —{" "}
+              <span className="italic text-gold">Pawna to Konkan.</span>
+            </h1>
+
+            <p className="mt-2.5 max-w-[20rem] line-clamp-3 text-[13px] leading-[1.58] text-ink-soft/95">
+              Discover handpicked luxury glamping domes, hillside villas, and lakeside cottages near Pawna
+              Lake, Lonavala, and across the entire Konkan coast — from Alibagh to Diveagar.
+            </p>
+          </div>
+
+          <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 pb-1">
+            {showInstallOption ? (
               <button
                 type="button"
                 onClick={() => setInstallOpen(true)}
-                className="press gold-gradient inline-flex items-center gap-2 rounded-[14px] px-5 py-3 text-[14px] font-semibold text-[#141007] shadow-[0_10px_28px_-12px_rgba(217,165,42,0.8)]"
+                className="press inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-[13px] font-semibold text-ink backdrop-blur-md"
               >
-                <Download className="h-[17px] w-[17px]" strokeWidth={2} />
+                <Download className="h-4 w-4 text-gold" strokeWidth={2} />
                 Install App
               </button>
-            </div>
-          ) : null}
-
-          <div className="mt-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gold/45 bg-black/40 px-3.5 py-1.5 backdrop-blur-md">
-              <Star className="h-3.5 w-3.5 fill-gold text-gold" strokeWidth={1.4} />
-              <span className="text-[12px] font-medium text-gold-pale">Premium Luxury Stays</span>
-            </div>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setHeroIndex((prev) => (prev + 1) % heroImages.length)}
+              className="press gold-gradient inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13px] font-semibold text-[#141007] shadow-[0_10px_28px_-12px_rgba(217,165,42,0.75)]"
+            >
+              <RefreshCw className="h-4 w-4" strokeWidth={2} />
+              Switch
+            </button>
           </div>
-
-          <h1 className="mt-5 font-display text-[34px] font-semibold leading-[1.14] text-ink">
-            Experience Extraordinary Escapes —{" "}
-            <span className="italic text-gold">Pawna to Konkan.</span>
-          </h1>
-
-          <p className="mt-3.5 max-w-[19rem] text-[13.5px] leading-[1.62] text-ink-soft">
-            Discover handpicked luxury glamping domes, hillside villas, and lakeside cottages near Pawna
-            Lake, Lonavala, and across the entire Konkan coast — from Alibagh to Diveagar. Your perfect
-            escape awaits.
-          </p>
-
-          <Link
-            to="/properties"
-            className="press gold-gradient mt-6 inline-flex items-center gap-3 rounded-[14px] px-6 py-3.5 text-[15px] font-semibold text-[#141007] shadow-[0_14px_34px_-14px_rgba(217,165,42,0.85)]"
-          >
-            Explore Properties
-            <ArrowRight className="h-[18px] w-[18px]" strokeWidth={2} />
-          </Link>
-          <div className="h-10" />
         </div>
       </section>
 
       {/* STATS */}
-      <section className="-mt-10 px-5">
+      <section className="mt-4 px-5">
         <div className="relative grid grid-cols-4 rounded-[18px] border border-hairline bg-[#0c1014]/95 px-2 py-4 backdrop-blur-xl">
           {stats.map(({ Icon, value, label }, i) => (
             <div
