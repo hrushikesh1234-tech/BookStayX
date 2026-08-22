@@ -122,6 +122,13 @@ function NavShell() {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+        {/* Completes the existing footer gold outline under the Referral crest only */}
+        <path
+          d="M 0 70 H 120"
+          stroke={STROKE}
+          strokeWidth="1.2"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
     </div>
   );
