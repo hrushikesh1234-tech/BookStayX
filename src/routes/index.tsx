@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ArrowRight,
   Download,
@@ -9,6 +9,8 @@ import {
   Star,
 } from "lucide-react";
 import { AppTopNav } from "@/components/AppTopNav";
+import { PwaInstallDialog } from "@/components/PwaInstallDialog";
+import { usePwaInstall } from "@/hooks/use-pwa-install";
 import { SectionLabel, SerifTitle } from "@/components/brand";
 import { LocationCard } from "@/components/LocationCard";
 import { PropertyCard } from "@/components/PropertyCard";
@@ -49,7 +51,24 @@ const tabs = [
 
 function HomePage() {
   const [tab, setTab] = useState<(typeof tabs)[number]["id"]>("top");
+  const [installOpen, setInstallOpen] = useState(false);
+  const { isInstalled, isIos, canNativeInstall, promptNativeInstall, showInstallOption } = usePwaInstall();
   const shown = properties.filter((p) => p.tab === tab);
+
+  const handleInstall = useCallback(async () => {
+    if (isIos) {
+      setInstallOpen(false);
+      return;
+    }
+
+    if (canNativeInstall) {
+      const accepted = await promptNativeInstall();
+      if (accepted) setInstallOpen(false);
+      return;
+    }
+
+    setInstallOpen(false);
+  }, [canNativeInstall, isIos, promptNativeInstall]);
 
   return (
     <div className="pb-8">
@@ -68,15 +87,18 @@ function HomePage() {
         <div className="hero-shade absolute inset-0" />
 
         <div className="relative px-5 pt-[calc(max(10px,env(safe-area-inset-top))+58px)]">
-          <div className="mt-1">
-            <button
-              type="button"
-              className="press gold-gradient inline-flex items-center gap-2 rounded-[14px] px-5 py-3 text-[14px] font-semibold text-[#141007] shadow-[0_10px_28px_-12px_rgba(217,165,42,0.8)]"
-            >
-              <Download className="h-[17px] w-[17px]" strokeWidth={2} />
-              Install App
-            </button>
-          </div>
+          {showInstallOption ? (
+            <div className="mt-1">
+              <button
+                type="button"
+                onClick={() => setInstallOpen(true)}
+                className="press gold-gradient inline-flex items-center gap-2 rounded-[14px] px-5 py-3 text-[14px] font-semibold text-[#141007] shadow-[0_10px_28px_-12px_rgba(217,165,42,0.8)]"
+              >
+                <Download className="h-[17px] w-[17px]" strokeWidth={2} />
+                Install App
+              </button>
+            </div>
+          ) : null}
 
           <div className="mt-3">
             <div className="inline-flex items-center gap-2 rounded-full border border-gold/45 bg-black/40 px-3.5 py-1.5 backdrop-blur-md">
@@ -187,6 +209,14 @@ function HomePage() {
           ))}
         </div>
       </section>
+
+      <PwaInstallDialog
+        open={installOpen}
+        isIos={isIos}
+        canNativeInstall={canNativeInstall}
+        onInstall={handleInstall}
+        onCancel={() => setInstallOpen(false)}
+      />
     </div>
   );
 }

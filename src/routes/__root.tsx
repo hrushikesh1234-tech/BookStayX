@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { BottomNavigation } from "@/components/BottomNavigation";
+import { PwaProvider } from "@/components/PwaProvider";
 import { cn } from "@/lib/utils";
 
 function NotFoundComponent() {
@@ -89,6 +90,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Premium glamping domes, hillside villas and lakeside cottages from Pawna to Konkan.",
       },
       { name: "theme-color", content: "#050709" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "BookStayX" },
+      { property: "og:url", content: "https://www.bookstayx.shop/" },
       { property: "og:title", content: "BookStayX — Luxury Konkan Escapes" },
       {
         property: "og:description",
@@ -105,7 +111,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "icon", href: "/icons/pwa-icon.jpg", type: "image/jpeg" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
     ],
   }),
   shellComponent: RootShell,
@@ -136,6 +144,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <PwaProvider>
       <div className="min-h-screen bg-[#050709]">
         <div
           className={cn(
@@ -148,6 +157,7 @@ function RootComponent() {
         </div>
         {hideAppChrome ? null : <BottomNavigation />}
       </div>
+      </PwaProvider>
     </QueryClientProvider>
   );
 }
