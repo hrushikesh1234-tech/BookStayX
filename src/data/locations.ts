@@ -180,7 +180,7 @@ export const locationGroups: LocationGroup[] = [
     layout: "trio",
     slugs: ["lonavala", "pawna-lake", "khandala"],
   },
-  { index: 2, title: "Karjat District", layout: "feature", slugs: ["karjat"] },
+  { index: 2, title: "Karjat District", layout: "trio", slugs: ["karjat"] },
   {
     index: 3,
     title: "Raigad District (Popular Weekend Hubs)",

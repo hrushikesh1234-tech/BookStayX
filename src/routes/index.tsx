@@ -226,10 +226,13 @@ function HomePage() {
           </div>
         </div>
 
-        <div className="no-scrollbar mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2">
+        <div
+          key={tab}
+          className="no-scrollbar mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth px-[7.5%] pb-3 [scroll-padding-inline:7.5%]"
+        >
           {shown.map((p) => (
-            <div key={p.id} className="snap-start">
-              <PropertyCard property={p} />
+            <div key={p.id} className="w-[85%] shrink-0 snap-center">
+              <PropertyCard property={p} className="w-full" />
             </div>
           ))}
         </div>
