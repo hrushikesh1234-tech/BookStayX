@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ArrowRight, ChevronDown, Heart, ListFilter } from "lucide-react";
 import { AppTopNav } from "@/components/AppTopNav";
 import { SavedCategoryIcon, SavedStayCard } from "@/components/SavedStayCard";
 import { properties, type PropertyCategory } from "@/data/locations";
+import { useHideOnScroll } from "@/hooks/use-hide-on-scroll";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/saved")({
@@ -32,6 +33,9 @@ function SavedPage() {
   const [category, setCategory] = useState<(typeof categories)[number]["id"]>("all");
   const [headerOffset, setHeaderOffset] = useState(64);
 
+  const filtersShellRef = useRef<HTMLDivElement>(null);
+  useHideOnScroll([filtersShellRef], { lockMs: 700, threshold: 64 });
+
   const saved = useMemo(() => {
     // Demo: treat current inventory as saved stays
     const base = properties.filter((p) => p.category !== "campings");
@@ -43,43 +47,46 @@ function SavedPage() {
     <div className="min-h-screen bg-[#0B0E11] pb-4">
       <AppTopNav onHeightChange={setHeaderOffset} />
 
-      <div className="px-4 pt-4">
-        <h1 className="text-[26px] font-bold leading-none tracking-[-0.02em] text-white">
-          Saved Stays <span className="align-middle text-[22px]">❤️</span>
-        </h1>
-        <p className="mt-2 text-[12.5px] leading-snug text-[#8B93A0]">
-          Your favorite stays, all in one place.
-        </p>
-      </div>
-
-      {/* Scrolls with page, then sticks exactly under the fixed header */}
-      <div
-        style={{ top: headerOffset }}
-        className="sticky z-30 bg-[#0B0E11] px-4 pb-3 pt-4"
-      >
-        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-0.5">
-          {categories.map(({ id, label }) => {
-            const active = category === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setCategory(id)}
-                className={cn(
-                  "press inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-[7px] text-[11.5px] font-semibold",
-                  active
-                    ? "border-[#E0B84A] bg-[#E0B84A]/[0.1] text-white"
-                    : "border-white/14 bg-white/[0.04] text-[#E8EAED]",
-                )}
-              >
-                <SavedCategoryIcon
-                  id={id}
-                  className={cn("h-[14px] w-[14px]", active ? "text-[#E0B84A]" : "text-[#E8EAED]")}
-                />
-                {label}
-              </button>
-            );
-          })}
+      {/* Category pills — hide on scroll up, return on scroll down */}
+      <div style={{ top: headerOffset }} className="sticky z-30">
+        <div
+          ref={filtersShellRef}
+          data-visible="true"
+          className={cn(
+            "group hide-on-scroll-panel grid",
+            "data-[visible=true]:grid-rows-[1fr] data-[visible=true]:opacity-100",
+            "data-[visible=false]:grid-rows-[0fr] data-[visible=false]:opacity-0",
+            "data-[visible=false]:pointer-events-none",
+          )}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="hide-on-scroll-inner px-4 pt-3 pb-3 group-data-[visible=false]:-translate-y-2 group-data-[visible=false]:opacity-0">
+              <div className="no-scrollbar flex items-center gap-1.5 overflow-x-auto pb-0.5">
+                {categories.map(({ id, label }) => {
+                  const active = category === id;
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setCategory(id)}
+                      className={cn(
+                        "press inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-[7px] text-[11.5px] font-semibold backdrop-blur-md",
+                        active
+                          ? "border-[#E0B84A]/70 bg-[#E0B84A]/12 text-white shadow-[0_0_0_1px_rgba(224,184,74,0.15)]"
+                          : "border-white/15 bg-white/[0.06] text-[#E8EAED]",
+                      )}
+                    >
+                      <SavedCategoryIcon
+                        id={id}
+                        className={cn("h-[14px] w-[14px]", active ? "text-[#E0B84A]" : "text-[#E8EAED]")}
+                      />
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

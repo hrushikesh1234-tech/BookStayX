@@ -17,7 +17,7 @@ const leftItems: NavDef[] = [
 ];
 
 const rightItems: NavDef[] = [
-  { to: "/bookings", label: "Bookings", shortLabel: "Trips", Icon: CalendarDays, exact: false },
+  { to: "/bookings", label: "Bookings", shortLabel: "Bookings", Icon: CalendarDays, exact: false },
   { to: "/saved", label: "Saved", shortLabel: "Saved", Icon: Heart, exact: false },
   { to: "/profile", label: "Profile", shortLabel: "Profile", Icon: User, exact: false },
 ];

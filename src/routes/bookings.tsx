@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   Ban,
   CalendarCheck2,
@@ -12,6 +12,7 @@ import {
 import { AppTopNav } from "@/components/AppTopNav";
 import { BookingCard } from "@/components/BookingCard";
 import { bookingSummary, bookings } from "@/data/bookings";
+import { useHideOnScroll } from "@/hooks/use-hide-on-scroll";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/bookings")({
@@ -38,53 +39,59 @@ function BookingsPage() {
   const [tab, setTab] = useState<BookingsTab>("live");
   const [headerOffset, setHeaderOffset] = useState(64);
 
+  const filtersShellRef = useRef<HTMLDivElement>(null);
+  useHideOnScroll([filtersShellRef], { lockMs: 700, threshold: 64 });
+
   const list = useMemo(() => bookings.filter((b) => b.tab === tab), [tab]);
 
   return (
     <div className="min-h-screen bg-[#0B0E11] pb-4">
       <AppTopNav onHeightChange={setHeaderOffset} />
 
-      <div className="px-4 pt-4">
-        <h1 className="text-[26px] font-bold leading-none tracking-[-0.02em] text-white">
-          My Bookings
-        </h1>
-        <p className="mt-2 text-[12.5px] leading-snug text-[#8B93A0]">
-          Manage all your stays and experiences
-        </p>
-      </div>
-
-      {/* Scrolls with page, then sticks exactly under the fixed header */}
-      <div
-        style={{ top: headerOffset }}
-        className="sticky z-30 bg-[#0B0E11] px-4 pb-3 pt-4"
-      >
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => setTab("live")}
-            className={cn(
-              "press flex items-center justify-center gap-2 rounded-[12px] border px-3 py-3 text-[12.5px] font-semibold",
-              tab === "live"
-                ? "border-[#E0B84A] bg-[#E0B84A]/[0.06] text-[#E0B84A]"
-                : "border-transparent bg-transparent text-[#8B93A0]",
-            )}
-          >
-            <CalendarClock className="h-[16px] w-[16px]" strokeWidth={1.7} />
-            Live Bookings
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("history")}
-            className={cn(
-              "press flex items-center justify-center gap-2 rounded-[12px] border px-3 py-3 text-[12.5px] font-semibold",
-              tab === "history"
-                ? "border-[#E0B84A] bg-[#E0B84A]/[0.06] text-[#E0B84A]"
-                : "border-transparent bg-transparent text-[#8B93A0]",
-            )}
-          >
-            <History className="h-[16px] w-[16px]" strokeWidth={1.7} />
-            Booking History
-          </button>
+      {/* Tab selectors — hide on scroll up, return on scroll down */}
+      <div style={{ top: headerOffset }} className="sticky z-30">
+        <div
+          ref={filtersShellRef}
+          data-visible="true"
+          className={cn(
+            "group hide-on-scroll-panel grid",
+            "data-[visible=true]:grid-rows-[1fr] data-[visible=true]:opacity-100",
+            "data-[visible=false]:grid-rows-[0fr] data-[visible=false]:opacity-0",
+            "data-[visible=false]:pointer-events-none",
+          )}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="hide-on-scroll-inner px-4 pt-3 pb-3 group-data-[visible=false]:-translate-y-2 group-data-[visible=false]:opacity-0">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTab("live")}
+                  className={cn(
+                    "press flex items-center justify-center gap-2 rounded-[12px] border px-3 py-2.5 text-[12px] font-semibold backdrop-blur-md",
+                    tab === "live"
+                      ? "border-[#E0B84A]/70 bg-[#E0B84A]/12 text-[#E0B84A] shadow-[0_0_0_1px_rgba(224,184,74,0.15)]"
+                      : "border-white/15 bg-white/[0.06] text-[#B0B6BF]",
+                  )}
+                >
+                  <CalendarClock className="h-[16px] w-[16px]" strokeWidth={1.7} />
+                  Live Bookings
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTab("history")}
+                  className={cn(
+                    "press flex items-center justify-center gap-2 rounded-[12px] border px-3 py-2.5 text-[12px] font-semibold backdrop-blur-md",
+                    tab === "history"
+                      ? "border-[#E0B84A]/70 bg-[#E0B84A]/12 text-[#E0B84A] shadow-[0_0_0_1px_rgba(224,184,74,0.15)]"
+                      : "border-white/15 bg-white/[0.06] text-[#B0B6BF]",
+                  )}
+                >
+                  <History className="h-[16px] w-[16px]" strokeWidth={1.7} />
+                  Booking History
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
